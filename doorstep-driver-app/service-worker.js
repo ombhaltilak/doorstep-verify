@@ -1,4 +1,4 @@
-const CACHE = 'doorstep-v11';
+const CACHE = 'doorstep-v12';
 const ASSETS = ['/', '/index.html', '/app.js', '/styles.css', '/manifest.json'];
 
 self.addEventListener('install', e => {

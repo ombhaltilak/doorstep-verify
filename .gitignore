@@ -1,3 +1,17 @@
+# Ignore everything in root by default
+/*
+
+# Allow these root files
+!.gitignore
+!PROTOTYPE.md
+!README.md
+!render.yaml
+
+# Allow subdirectory folders (the actual app code)
+!doorstep-driver-app/
+!doorstep-admin-app/
+!doorstep-verify-api/
+
 # Python
 venv/
 .venv/
@@ -16,19 +30,10 @@ build/
 .DS_Store
 Thumbs.db
 
-# LibreOffice temp locks
-.~lock.*
-
 # Logs
 *.log
 server.log
 
 # Temp
 /tmp/
-
-project-summary.md
-*~
-*.docx
-CLAUDE.md
-generate_*.py
 *.pem
