@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>DoorStep — Proof of Delivery</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <meta name="theme-color" content="#1A376C">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/piexifjs/piexif.js"></script>
+</head>
+<body>
+
+  <!-- ── Screen 1 — Sign In ─────────────────────────────────────────────── -->
+  <div id="screen-login" class="screen active">
+    <div class="screen-content center">
+      <div class="logo">📦</div>
+      <h1>DoorStep</h1>
+      <p class="subtitle">Proof of Delivery</p>
+      <div class="card">
+        <label>Driver ID</label>
+        <input id="driver-id" type="text" placeholder="Enter your driver ID" autocomplete="off">
+        <button class="btn-primary" onclick="login()">Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Screen 2 — My Deliveries ──────────────────────────────────────── -->
+  <div id="screen-list" class="screen">
+    <div class="topbar">
+      <button class="btn-sm" onclick="showScreen('screen-login')" title="Change Driver">← Sign Out</button>
+      <span class="topbar-title">
+        <span id="topbar-driver" style="font-size:12px;opacity:0.8"></span> My Deliveries
+      </span>
+      <button class="btn-sm" onclick="loadDeliveries()">↻ Refresh</button>
+    </div>
+    <div class="screen-content">
+      <div id="delivery-list">
+        <div class="loading">Loading deliveries...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Screen 3 — Verify Package ─────────────────────────────────────── -->
+  <div id="screen-barcode" class="screen">
+    <div class="topbar">
+      <button class="btn-sm" onclick="showScreen('screen-list')">← Back</button>
+      <span class="topbar-title">Verify Package</span>
+    </div>
+    <div class="screen-content">
+      <p class="hint">Align camera with the package barcode</p>
+      <div class="camera-wrap">
+        <video id="barcode-video" autoplay playsinline></video>
+        <div class="scan-line"></div>
+      </div>
+      <button class="btn-torch" id="torch-btn" onclick="toggleTorch()">🔦 Torch OFF</button>
+      <div id="barcode-result" class="status-box" style="display:none"></div>
+      <div class="divider">— or enter manually —</div>
+      <input id="manual-barcode" type="text" placeholder="Enter tracking number" style="font-size:1.1rem;padding:10px">
+      <button class="btn-secondary" onclick="useManualBarcode()">Confirm</button>
+    </div>
+  </div>
+
+  <!-- ── Screen 4 — Location Verification ─────────────────────────────── -->
+  <div id="screen-gps" class="screen">
+    <div class="topbar">
+      <button class="btn-sm" onclick="gpsGoBack()">← Back</button>
+      <span class="topbar-title">Location Verification</span>
+    </div>
+    <div class="screen-content center">
+      <div id="gps-icon" class="big-icon">📡</div>
+      <div id="gps-status" class="status-text">Acquiring GPS signal...</div>
+      <div class="accuracy-bar-wrap">
+        <div id="gps-accuracy-bar">
+          <div id="gps-accuracy-fill"></div>
+        </div>
+        <div id="gps-accuracy-label">Signal strength: acquiring...</div>
+      </div>
+      <div id="gps-coords" class="coords-text"></div>
+      <div id="gps-w3w" class="w3w-badge" style="display:none">
+        <span class="w3w-icon">///</span>
+        <span id="w3w-words">loading...</span>
+      </div>
+      <button id="btn-to-capture" class="btn-primary" onclick="goToCapture()" disabled>
+        Proceed to Capture
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Screen 5 — Capture Proof of Delivery ──────────────────────────── -->
+  <div id="screen-choose" class="screen">
+    <div class="topbar">
+      <button class="btn-sm" onclick="chooseGoBack()">← Back</button>
+      <span class="topbar-title">Capture Proof</span>
+    </div>
+    <div class="screen-content center">
+      <p class="hint">Select your proof capture method</p>
+      <button class="btn-mode" onclick="startPhotoMode()">
+        <span class="mode-icon">📷</span>
+        <span class="mode-title">Photo</span>
+        <span class="mode-sub">Capture a location-stamped photo</span>
+      </button>
+      <button class="btn-mode" onclick="startVideoMode()">
+        <span class="mode-icon">🎥</span>
+        <span class="mode-title">Video</span>
+        <span class="mode-sub">Record a location-stamped video</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Screen 6A — Photo Proof ───────────────────────────────────────── -->
+  <div id="screen-photo" class="screen">
+    <div class="topbar">
+      <button class="btn-sm" onclick="photoGoBack()">← Back</button>
+      <span class="topbar-title">Photo Proof</span>
+    </div>
+    <div class="screen-content">
+      <p class="hint">Ensure the front door and package are both visible</p>
+      <div class="camera-wrap">
+        <video id="photo-video" autoplay playsinline></video>
+        <div id="photo-gps-badge" class="cam-gps-badge">Locating...</div>
+      </div>
+      <canvas id="photo-canvas" style="display:none"></canvas>
+      <button class="btn-primary" onclick="captureGeotaggedPhoto()">📸 Capture Photo</button>
+      <div id="photo-preview-wrap" style="display:none">
+        <p class="hint">Review before submitting</p>
+        <img id="photo-preview" class="preview-img">
+        <button class="btn-primary" id="btn-submit-photo" onclick="submitPhoto()">
+          ✅ Submit Proof
+        </button>
+        <button class="btn-secondary" onclick="retakePhoto()">Retake</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Screen 6B — Video Proof ───────────────────────────────────────── -->
+  <div id="screen-video" class="screen">
+    <div class="topbar">
+      <button class="btn-sm" id="btn-video-back" onclick="videoGoBack()">← Back</button>
+      <span class="topbar-title">Video Proof</span>
+    </div>
+    <div class="screen-content">
+      <p class="hint">Ensure the front door and package are both visible</p>
+      <video id="video-source" autoplay playsinline style="display:none"></video>
+      <canvas id="video-canvas" class="video-canvas"></canvas>
+      <div id="video-gps-status" class="cam-gps-badge">Locating...</div>
+      <div id="rec-timer" class="rec-timer" style="display:none">⏺ Recording: 0s</div>
+      <button id="btn-record" class="btn-primary" onclick="startRecording()">⏺ Start Recording</button>
+      <button id="btn-stop" class="btn-danger" onclick="stopRecording()" style="display:none">
+        ⏹ Stop &amp; Submit
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Screen 7 — Processing ─────────────────────────────────────────── -->
+  <div id="screen-uploading" class="screen">
+    <div class="screen-content center">
+      <div class="spinner"></div>
+      <h2>Processing Delivery</h2>
+      <p>Uploading proof and running verification checks</p>
+      <p id="upload-steps" class="hint"></p>
+    </div>
+  </div>
+
+  <!-- ── Screen 8 — Result ─────────────────────────────────────────────── -->
+  <div id="screen-result" class="screen">
+    <div class="screen-content center">
+      <div id="result-icon" class="result-icon"></div>
+      <h2 id="result-title"></h2>
+      <div id="result-checks" class="checks-list"></div>
+      <div id="result-hash" class="hash-box"></div>
+      <button class="btn-primary" onclick="nextDelivery()">Next Delivery</button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/gps.js"></script>
+  <script src="js/barcode.js"></script>
+  <script src="js/photo.js"></script>
+  <script src="js/video.js"></script>
+</body>
+</html>

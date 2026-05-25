@@ -1,0 +1,47 @@
+services:
+
+  # ── API Backend ─────────────────────────────────────────────────────────
+  - type: web
+    name: doorstep-verify-api
+    runtime: python
+    rootDir: doorstep-verify-api
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+      - key: W3W_API_KEY
+        sync: false
+
+  # ── Driver App (PWA) ─────────────────────────────────────────────────────
+  - type: web
+    name: doorstep-driver
+    env: static
+    rootDir: doorstep-driver-app
+    staticPublishPath: .
+    buildCommand: ""
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+
+  # ── Admin / Dispatch Portal ──────────────────────────────────────────────
+  - type: web
+    name: doorstep-admin
+    env: static
+    rootDir: doorstep-admin-app
+    staticPublishPath: .
+    buildCommand: ""
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate

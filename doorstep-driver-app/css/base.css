@@ -1,0 +1,71 @@
+/* ── Reset & Base ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue-dark:  #1A376C;
+  --blue-mid:   #255FA8;
+  --blue-light: #EEF4FB;
+  --green:      #10A050;
+  --green-bg:   #E6F4EA;
+  --red:        #C03020;
+  --red-bg:     #FDECEA;
+  --orange:     #E07000;
+  --text:       #1E1E2E;
+  --gray:       #666;
+  --border:     #D0D8E8;
+  --white:      #FFFFFF;
+  --radius:     12px;
+  --shadow:     0 2px 12px rgba(0,0,0,0.10);
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  background: var(--blue-light);
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── Screens ───────────────────────────────────────────────────────────── */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  background: var(--blue-light);
+  overflow-y: auto;
+}
+.screen.active { display: flex; }
+
+.screen-content {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 32px;
+}
+.screen-content.center {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ── Top Bar ───────────────────────────────────────────────────────────── */
+.topbar {
+  background: var(--blue-dark);
+  color: var(--white);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  flex-shrink: 0;
+}
+.topbar-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 15px;
+  text-align: center;
+}

@@ -1,0 +1,34 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Secrets — NEVER commit
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LibreOffice temp locks
+.~lock.*
+
+# Logs
+*.log
+server.log
+
+# Temp
+/tmp/
+
+project-summary.md
+*~
+*.docx
+CLAUDE.md
+generate_*.py
+*.pem
