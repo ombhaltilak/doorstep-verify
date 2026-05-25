@@ -32,7 +32,7 @@ function startGPSWatch() {
   const iconEl     = document.getElementById('gps-icon');
 
   // Reset GPS screen DOM to fresh state
-  statusEl.textContent          = 'Acquiring GPS signal...';
+  statusEl.textContent          = 'Acquiring location — hold the phone steady...';
   fillEl.style.width            = '0%';
   fillEl.style.background       = '#C03020';
   labelEl.textContent           = 'Signal strength: acquiring...';
@@ -78,37 +78,37 @@ function startGPSWatch() {
         fillEl.style.background = '#10A050';
         labelEl.textContent = `Excellent ±${display.toFixed(0)}m${sampleNote}`;
         iconEl.textContent  = '📍';
-        statusEl.textContent = 'Location confirmed — excellent signal';
+        statusEl.textContent = 'Location locked — excellent accuracy ✓';
         proceedBtn.disabled = false;
       } else if (display <= 15) {
         fillEl.style.background = '#50C030';
         labelEl.textContent = `Strong ±${display.toFixed(0)}m${sampleNote}`;
         iconEl.textContent  = '📍';
-        statusEl.textContent = 'Location confirmed — strong signal';
+        statusEl.textContent = 'Location locked — strong accuracy ✓';
         proceedBtn.disabled = false;
       } else if (display <= 25) {
         fillEl.style.background = '#80C000';
         labelEl.textContent = `Good ±${display.toFixed(0)}m${sampleNote}`;
         iconEl.textContent  = '📍';
         statusEl.textContent = sampleCount < 6
-          ? 'Improving signal — please wait...'
-          : 'Location ready — good signal';
+          ? 'Refining accuracy — stay still for a moment...'
+          : 'Location ready — good enough to proceed ✓';
         proceedBtn.disabled = false;
       } else if (display <= 40) {
         fillEl.style.background = '#F0A000';
         labelEl.textContent = `Moderate ±${display.toFixed(0)}m${sampleNote}`;
-        statusEl.textContent = 'Moderate signal — move outdoors for better accuracy';
+        statusEl.textContent = 'Moderate accuracy — stand in an open area and hold still...';
         proceedBtn.disabled = false;
       } else {
         fillEl.style.background = '#C03020';
         labelEl.textContent = `Weak ±${display.toFixed(0)}m — acquiring${sampleNote}`;
-        statusEl.textContent = 'Weak signal — please move outdoors';
+        statusEl.textContent = 'Low accuracy — step into open sky area, away from tall buildings...';
         iconEl.textContent  = '📡';
         proceedBtn.disabled = true;
       }
     },
     (err) => {
-      statusEl.textContent = 'Location unavailable — please enable GPS in device settings';
+      statusEl.textContent = 'Location unavailable — check GPS is enabled in device settings';
     },
     { enableHighAccuracy: true, maximumAge: 3000, timeout: 30000 }
   );
