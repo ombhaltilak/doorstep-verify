@@ -372,7 +372,7 @@ The API accepts standard JSON and returns structured results. Integration with a
 **Driver App:** `https://doorstep-driver.onrender.com`
 **Admin Portal:** `https://doorstep-admin.onrender.com`
 
-*Note: First load after inactivity may take 20–30 seconds on the free tier as the API wakes up.*
+*Note: First load after inactivity may take 30-60 seconds on the free tier as the API wakes up.*
 
 ---
 
